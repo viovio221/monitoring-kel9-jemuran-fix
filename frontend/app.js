@@ -5,7 +5,7 @@
 */
 
 // Configuration
-const API_URL = ''; // Relative path, works automatically when served by Express
+const API_URL = 'https://monitoring-kel9-jemuran-fix-production.up.railway.app'; // Relative path, works automatically when served by Express
 const POLL_INTERVAL = 2000; // Polling data cuaca (2 detik)
 const HISTORY_INTERVAL = 10000; // Polling riwayat cuaca (10 detik)
 
