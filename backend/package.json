@@ -1,0 +1,25 @@
+{
+  "name": "sistem-monitoring-jemuran-backend",
+  "version": "1.0.0",
+  "description": "Backend API dan database untuk Sistem Monitoring Jemuran Pintar IoT",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "sqlite3": "^5.1.7"
+  },
+  "keywords": [
+    "arduino",
+    "esp8266",
+    "esp32",
+    "iot",
+    "laundry-monitor",
+    "sqlite"
+  ],
+  "author": "Antigravity",
+  "license": "MIT"
+}

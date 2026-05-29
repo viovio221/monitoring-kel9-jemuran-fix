@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistem Monitoring Jemuran Pintar - IoT</title>
+  
+  <!-- Google Fonts: Outfit & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome for Premium Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- CSS Styling -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="theme-sunny">
+
+  <!-- Hujan Particle Container (Dihasilkan secara dinamis lewat JS) -->
+  <div id="rain-particles" class="rain-overlay"></div>
+
+  <!-- Main Container -->
+  <div class="app-container">
+    
+    <!-- Header -->
+    <header class="main-header">
+      <div class="brand">
+        <div class="logo-icon">
+          <i class="fa-solid fa-cloud-sun-rain"></i>
+        </div>
+        <div class="brand-text">
+          <h1>SISTEM MONITORING JEMURAN</h1>
+          <span class="sub-brand">IoT Smart Laundry Protector</span>
+        </div>
+      </div>
+      <div class="connection-status" id="connection-badge">
+        <span class="pulse-dot"></span>
+        <span id="connection-text">Menghubungkan...</span>
+      </div>
+    </header>
+
+    <!-- Danger Alert Banner (Hanya muncul saat hujan) -->
+    <div id="danger-banner" class="danger-banner hide">
+      <div class="banner-content">
+        <i class="fa-solid fa-circle-exclamation fa-bounce"></i>
+        <span>🚨 PERINGATAN: JEMURAN TERKENA HUJAN! SEGERA ANGKAT PAKAIAN! 🚨</span>
+      </div>
+    </div>
+
+    <!-- Dashboard Grid -->
+    <main class="dashboard-grid">
+      
+      <!-- Left Column: Status Utama -->
+      <section class="card glass-card status-card">
+        <div class="card-header">
+          <h2><i class="fa-solid fa-satellite-dish"></i> Status Real-Time</h2>
+          <span class="last-update" id="last-update-time">Terakhir Update: --:-- WIB</span>
+        </div>
+        
+        <div class="status-display">
+          <!-- Weather Animation Widget -->
+          <div class="weather-visualizer">
+            <div id="weather-icon-container" class="weather-icon-wrapper">
+              <!-- Ikon akan dimasukkan secara dinamis oleh JS -->
+              <i class="fa-solid fa-sun weather-icon sun-glow"></i>
+            </div>
+          </div>
+          
+          <!-- Weather Details -->
+          <div class="weather-info">
+            <span class="info-label">Kondisi Cuaca Saat Ini</span>
+            <span class="info-value" id="weather-status">MENGAMBIL DATA...</span>
+            
+            <div class="divider"></div>
+            
+            <span class="info-label">Status Kondisi Jemuran</span>
+            <span class="info-value-large" id="laundry-condition">MENGAMBIL DATA...</span>
+          </div>
+        </div>
+
+        <!-- Color Indicator Palette -->
+        <div class="color-indicators">
+          <div class="indicator-item" id="indicator-rain">
+            <span class="dot dot-red"></span>
+            <span>Hujan</span>
+          </div>
+          <div class="indicator-item" id="indicator-drizzle">
+            <span class="dot dot-yellow"></span>
+            <span>Gerimis</span>
+          </div>
+          <div class="indicator-item" id="indicator-sunny">
+            <span class="dot dot-green"></span>
+            <span>Cerah</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Right Column: Sensor Metrics & Controller -->
+      <div class="right-column">
+        
+        <!-- Wetness Gauge Card -->
+        <section class="card glass-card metric-card">
+          <div class="card-header">
+            <h2><i class="fa-solid fa-droplet"></i> Kelembaban Sensor</h2>
+          </div>
+          <div class="metric-container">
+            <div class="gauge-wrapper">
+              <svg class="gauge" viewBox="0 0 100 100">
+                <circle class="gauge-bg" cx="50" cy="50" r="45"></circle>
+                <circle class="gauge-fill" id="gauge-fill-circle" cx="50" cy="50" r="45" stroke-dasharray="283" stroke-dashoffset="283"></circle>
+              </svg>
+              <div class="gauge-text">
+                <span class="gauge-value" id="gauge-percent">0%</span>
+                <span class="gauge-label">Kebasahan</span>
+              </div>
+            </div>
+            
+            <div class="metric-details">
+              <div class="detail-row">
+                <span>Nilai Sensor (ADC):</span>
+                <strong id="raw-sensor-val">0</strong>
+              </div>
+              <div class="detail-row">
+                <span>Threshold Hujan:</span>
+                <strong>&lt; 350</strong>
+              </div>
+              <div class="detail-row">
+                <span>Threshold Gerimis:</span>
+                <strong>350 - 750</strong>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Alarm Control Card -->
+        <section class="card glass-card control-card">
+          <div class="card-header">
+            <h2><i class="fa-solid fa-volume-high"></i> Alarm & Notifikasi</h2>
+          </div>
+          <div class="control-container">
+            <div class="alarm-status-widget" id="web-alarm-widget">
+              <div class="alarm-bell-icon" id="alarm-bell-icon">
+                <i class="fa-solid fa-bell"></i>
+              </div>
+              <div class="alarm-bell-text">
+                <h3 id="alarm-title">Alarm Siaga</h3>
+                <p id="alarm-subtitle">Mengawasi sensor cuaca...</p>
+              </div>
+            </div>
+            
+            <div class="control-actions">
+              <button class="btn btn-secondary" id="btn-test-alarm">
+                <i class="fa-solid fa-bullhorn"></i> Tes Alarm Browser
+              </button>
+              <button class="btn btn-secondary" id="btn-toggle-sound">
+                <i class="fa-solid fa-volume-xmark" id="sound-icon"></i> <span id="sound-text">Mute Suara</span>
+              </button>
+            </div>
+          </div>
+        </section>
+        
+      </div>
+      
+    </main>
+
+    <!-- Bottom Section: History Logs -->
+    <section class="card glass-card history-section">
+      <div class="card-header history-header-wrapper">
+        <h2><i class="fa-solid fa-clock-rotate-left"></i> Riwayat Kondisi Cuaca</h2>
+        <div class="history-actions">
+          <button class="btn btn-danger" id="btn-clear-history">
+            <i class="fa-solid fa-trash-can"></i> Bersihkan Riwayat
+          </button>
+          <button class="btn btn-primary" id="btn-refresh-history">
+            <i class="fa-solid fa-arrows-rotate"></i> Refresh
+          </button>
+        </div>
+      </div>
+      
+      <div class="table-container">
+        <table class="history-table">
+          <thead>
+            <tr>
+              <th><i class="fa-solid fa-hashtag"></i> ID</th>
+              <th><i class="fa-solid fa-calendar-day"></i> Tanggal</th>
+              <th><i class="fa-solid fa-clock"></i> Waktu</th>
+              <th><i class="fa-solid fa-cloud-showers-heavy"></i> Status Cuaca</th>
+              <th><i class="fa-solid fa-gauge-high"></i> Nilai Sensor</th>
+              <th><i class="fa-solid fa-shield-halved"></i> Kondisi</th>
+            </tr>
+          </thead>
+          <tbody id="history-table-body">
+            <!-- Data akan dimuat dinamis oleh JS -->
+            <tr>
+              <td colspan="6" class="text-center">Memuat riwayat data...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+    
+    <!-- Footer -->
+    <footer class="app-footer">
+      <p>Sistem Monitoring Jemuran Pintar &copy; 2026. Dibuat dengan <i class="fa-solid fa-heart text-danger"></i> untuk Kemudahan Jemuran Anda.</p>
+      <div class="developer-credits">
+        <span>Backend: Node.js &bull; Database: SQLite &bull; Protokol: HTTP (WiFi)</span>
+      </div>
+    </footer>
+    
+  </div>
+
+  <!-- JavaScript App Logic -->
+  <script src="app.js"></script>
+</body>
+</html>
